@@ -1,1 +1,80 @@
 #This project utilizes R to investigate and visualize air quality data from the EPA. AQSR is an R package for accessing EPA AQS (Air Quality System) data from the EPA’s Data Mart. This package provides an R interface for the EPA Air Quality System.
+
+#1. Create a plot that portrays ozone levels at the Evanston, IL station from May through October in 2020.
+
+library(devtools)     # load the devtools library
+library(ggplot2)      # load the ggplot2 library
+library(aqsr)         # load the aqsr package
+
+# myuser variable so we don't have to enter email and keys each time
+myuser <- aqsr::create_user(email="georgejmaku@gmail.com",key="goldfrog67")
+
+# IL FIPS number is 17      
+# IL Cook County codes is 031
+# The Evanston_water_plant site number is 7002
+
+o3_data <- aqsr::aqs_sampleData(endpoint="bySite",
+                        aqs_user=myuser,
+                        param="44201",    # this is the ozone parameter
+			                  state="17",       # this is the Illinois FIPs number
+                        county="031",     # this is the Cook County Code
+                        bdate="20200501", # begin date as YYYYMMDD
+                        edate="20200930", # end date as YYYYMMDD
+                        site="7002") # This is the Evanston Water Plant
+
+View(o3_data)           # displays the data table in a new tab
+# Convert the date_local column from a Character Class to an R Date Class
+o3_data$date_local <- as.Date(o3_data$date_local, format="%Y-%m-%d")  
+
+# Append two new columns for other use
+
+o3_data$date_time <- as.POSIXct(paste(o3_data$date_local,o3_data$time_local),format="%Y-%m-%d %H:%M")
+o3_data$year <- as.numeric(format(o3_data$date_local, "%Y"))
+
+View(o3_data) # Check out the two new columns
+
+max(o3_data$sample_measurement,na.rm=TRUE) # this prints the max O3 in the console.
+maxindex = which.max(o3_data$sample_measurement)  # Gives the index of the maximum
+o3_data$date_time[maxindex]                       # Date of maximum
+
+# Now we use ggplot to plot this data
+
+ggplot(data=o3_data) +
+theme(axis.text.x = element_text(angle = 45,size=8)) +  # Rotate axis labels
+theme(axis.text.y = element_text(size=10)) +  
+theme(axis.title.y = element_text(size=12)) +  
+theme(plot.tag = element_text(size=5)) +  
+theme(plot.subtitle = element_text(size=7)) +  
+labs(y = "Ozone (ppm)", x="Time") +
+labs(title="Ozone in Evanston", subtitle=o3_data$year[1]) +
+  labs(tag="ENVI 301", caption="George Maku") +geom_line(data=o3_data,    
+          mapping=aes(x=date_time,y=sample_measurement,group=1),colour="blue") +
+theme(legend.position="none")
+
+
+#2. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
