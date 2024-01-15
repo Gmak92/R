@@ -1,0 +1,1 @@
+#This project utilizes R to investigate and visualize air quality data from the EPA. AQSR is an R package for accessing EPA AQS (Air Quality System) data from the EPA’s Data Mart. This package provides an R interface for the EPA Air Quality System.
